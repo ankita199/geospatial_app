@@ -1,0 +1,4 @@
+<h4>
+<%= link_to "Back to main page", tickets_path %>
+</h4>
+<div data-controller="map" data-map-target="map" data-map-polygon-coordinates="<%= (RGeo::GeoJSON.encode(RGeo::GeoJSON::Feature.new(@ticket.well_known_text,nil, { name: @ticket.excavator.company_name, address: @ticket.excavator.address }))).to_json %>" style="height: 800px;"></div>

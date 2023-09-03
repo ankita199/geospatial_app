@@ -1,0 +1,13 @@
+<table>
+  <tr>
+    <th>Request Number</th>
+    <th>Address</th>
+    <th>Request Type</th>
+    <th>Link</th>
+  </tr>
+  <% @tickets.each do |ticket| %>
+    <tr>
+      <%= render ticket %>
+    </tr>
+  <% end %>
+</table>
