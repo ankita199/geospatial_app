@@ -1,34 +1,40 @@
-# app/controllers/api/tickets_controller.rb
+require 'json-schema'
 module Api
   class TicketsController < ApplicationController
-    protect_from_forgery with: :null_session # Disable CSRF protection for simplicity in this example
+    before_action :parse_json_data, only: [:create]
 
     def create
-      json_data = JSON.parse(request.body.read)
-
-      ticket = Ticket.new(
-        request_number: json_data["RequestNumber"],
-        sequence_number: json_data["SequenceNumber"],
-        request_type: json_data["RequestType"],
-        request_action: json_data["RequestAction"],
-        response_due_date: DateTime.parse(json_data["DateTimes"]["ResponseDueDateTime"]),
-        sacode_primary: json_data["ServiceArea"]["PrimaryServiceAreaCode"]["SACode"],
-        sacode_additional: json_data["ServiceArea"]["AdditionalServiceAreaCodes"]["SACode"].join(","),
-        well_known_text: json_data["ExcavationInfo"]["DigsiteInfo"]["WellKnownText"]
-      )
-
-      excavator_data = json_data["Excavator"]
-      excavator = ticket.build_excavator(
-        company_name: excavator_data["CompanyName"],
-        address: excavator_data["Address"],
-        crew_on_site: excavator_data["CrewOnsite"] == "true"
-      )
-
-      if ticket.save && excavator.save
-        render json: { message: "Ticket and Excavator created successfully" }, status: :created
-      else
-        render json: { errors: ticket.errors.full_messages + excavator.errors.full_messages }, status: :unprocessable_entity
+      unless valid_json_data?
+        render json: { errors: 'Invalid JSON data' }, status: :unprocessable_entity
+        return
       end
+
+      service = TicketCreationService.new(@json_data)
+      result = service.create_ticket_and_excavator
+
+      if result[:success]
+        render json: { message: result[:message] }, status: :created
+      else
+        render json: { errors: result[:errors] }, status: :unprocessable_entity
+      end
+    end
+
+    private
+
+    def parse_json_data
+      begin
+        @json_data = JSON.parse(request.body.read) rescue {}
+      rescue Exception => e
+        @json_data = {}
+      end
+    end
+
+    def valid_json_data?
+      JSON::Validator.validate(json_schema, @json_data)
+    end
+
+    def json_schema
+      JSON.parse(File.read('config/schemas/geospatial.json'))
     end
   end
 end

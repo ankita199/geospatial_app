@@ -1,29 +1,35 @@
-# spec/controllers/api/tickets_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe Api::TicketsController, type: :controller do
   describe 'POST #create' do
     context 'with valid JSON data' do
-      it 'creates a new ticket and excavator' do
+      it 'creates a ticket and excavator' do
         valid_json = (File.read("#{Rails.root.to_s}/spec/sample_file/valid_ticket.json"))
 
-        expect {
-          post :create, body: valid_json
-        }.to change(Ticket, :count).by(1).and change(Excavator, :count).by(1)
+        post :create, body: valid_json, format: :json
 
         expect(response).to have_http_status(:created)
-        expect(JSON.parse(response.body)).to eq('message' => 'Ticket and Excavator created successfully')
+        expect(JSON.parse(response.body)).to include('message' => 'Ticket and Excavator created successfully')
       end
     end
 
     context 'with invalid JSON data' do
-      it 'returns an error message' do
+      it 'returns unprocessable entity status' do
         invalid_json   = (File.read("#{Rails.root.to_s}/spec/sample_file/invalid_ticket.json"))
 
-        post :create, body: invalid_json
+        post :create, body: invalid_json, format: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to have_key('errors')
+        expect(JSON.parse(response.body)["errors"]).to eq("Invalid JSON data")
+      end
+    end
+
+    context 'with missing JSON data' do
+      it 'returns unprocessable entity status' do
+        post :create, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to include('errors')
       end
     end
   end

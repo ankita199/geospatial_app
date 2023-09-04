@@ -1,0 +1,110 @@
+{
+  "type": "object",
+  "properties": {
+    "RequestNumber": {
+      "type": "string"
+    },
+    "SequenceNumber": {
+      "type": "string"
+    },
+    "RequestType": {
+      "type": "string"
+    },
+    "RequestAction": {
+      "type": "string"
+    },
+    "DateTimes": {
+      "type": "object",
+      "properties": {
+        "ResponseDueDateTime": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "required": [
+        "ResponseDueDateTime"
+      ]
+    },
+    "ServiceArea": {
+      "type": "object",
+      "properties": {
+        "PrimaryServiceAreaCode": {
+          "type": "object",
+          "properties": {
+            "SACode": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "SACode"
+          ]
+        },
+        "AdditionalServiceAreaCodes": {
+          "type": "object",
+          "properties": {
+            "SACode": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "SACode"
+          ]
+        }
+      },
+      "required": [
+        "PrimaryServiceAreaCode",
+        "AdditionalServiceAreaCodes"
+      ]
+    },
+    "ExcavationInfo": {
+      "type": "object",
+      "properties": {
+        "DigsiteInfo": {
+          "type": "object",
+          "properties": {
+            "WellKnownText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "WellKnownText"
+          ]
+        }
+      },
+      "required": [
+        "DigsiteInfo"
+      ]
+    },
+    "Excavator": {
+      "type": "object",
+      "properties": {
+        "CompanyName": {
+          "type": "string"
+        },
+        "Address": {
+          "type": "string"
+        },
+        "CrewOnsite": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "CompanyName",
+        "Address"
+      ]
+    }
+  },
+  "required": [
+    "RequestNumber",
+    "SequenceNumber",
+    "RequestType",
+    "RequestAction",
+    "DateTimes",
+    "ServiceArea",
+    "ExcavationInfo",
+    "Excavator"
+  ]
+}
